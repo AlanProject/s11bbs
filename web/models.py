@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
-from django.contrib.auth.modles import User
+from django.contrib.auth.models import User
 # Create your models here.
 
 # 帖子
@@ -24,7 +24,7 @@ class Article(models.Model):
 class Comment(models.Model):
     article = models.ForeignKey("Article")
     user = models.ForeignKey('UserProfile')
-    parent_comment = models.ForeignKey('self', relate_name='p_comment', blank=True, null=True)
+    parent_comment = models.ForeignKey('self',related_name='p_comment', blank=True, null=True)
     comment = models.TextField(max_length=1000)
     date = models.TimeField(auto_now=True)
 
@@ -51,9 +51,9 @@ class Category(models.Model):
 
 # 用户
 class UserProfile(models.Model):
-    user = models.OneToOneField('User')
+    user = models.OneToOneField(User)
     name = models.CharField(max_length=32)
-    groups = models.ManyToManyField("UserProfile")
+    groups = models.ManyToManyField("UserGroup")
 
     def __unicode__(self):
         return self.name
