@@ -20,5 +20,8 @@ from web import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index),
+    url(r'^article_list/(\d+)/$', views.article_list,name='article_list'),
+    url(r'^user_logout/', views.user_logout,name='user_logout'),
+    url(r'^send_post/', views.send_post,name='send_post'),
 
 ]
