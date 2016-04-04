@@ -1,0 +1,13 @@
+{% extends 'index.html' %}
+{% block head_template %}
+{% endblock %}
+
+{% block content_template %}
+    {% csrf_token %}
+    {{ contents.title }}
+    <hr />
+    {{ contents.content }}
+{% endblock %}
+
+{% block bottom_template %}
+{% endblock %}

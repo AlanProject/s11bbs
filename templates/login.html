@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+{% block head_template %}
+    <link rel="stylesheet" href="/static/css/userlogin.css" />
+{% endblock %}
+
+{% block content_template %}
+    <div class="col-md-3 login_center">
+        <form action="" method="post" class="form-signin">{% csrf_token %}
+            <h2 class="form-signin-heading">用户登录</h2>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="text" name="username" id="inputEmail" class="form-control" placeholder="User Name" required autofocus>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" name="passwd" id="inputPassword" class="form-control" placeholder="Password" required>
+            <div>
+              <label>
+                <a href="{% url 'register' %}">还没有用户？</a>
+              </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+            <label>
+                <a style="color:red; font-size:12px;">{{ error_messages }}</a>
+            </label>
+        </form>
+    </div>
+{% endblock %}
+
+{% block bottom_template %}
+{% endblock %}

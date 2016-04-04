@@ -1,0 +1,44 @@
+{% extends 'index.html' %}
+
+{% block head_template %}
+{% endblock %}
+{% block content_template %}
+    <div class="col-md-5">
+        <form class="form-horizontal">
+            <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" id="inputEmail3" placeholder="user name">
+                </div>
+            </div>
+            <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">邮  箱</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+                </div>
+            </div>
+            <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">密  码</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" id="inputEmail3" placeholder="password">
+                </div>
+            </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> Remember me
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-default">Sign in</button>
+            </div>
+          </div>
+        </form>
+    </div>
+{% endblock %}
+{% block bottom_template %}
+{% endblock %}

@@ -1,0 +1,8 @@
+.login_center{
+    position: absolute;
+    left:30%;
+}
+
+.login_center input,label{
+    margin-top:15px;
+}

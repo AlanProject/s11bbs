@@ -1,0 +1,29 @@
+{% extends 'index.html' %}
+
+{% block head_template %}
+    <link rel="stylesheet" href="/static/css/article_list.css">
+{% endblock %}
+
+{% block content_template %}
+    <div class="row">
+        <div class="col-md-7 content-left">
+            {% for item in contents %}
+                <div class="row">
+                    <div class="col-md-4 head_img">
+                        <img src="/uploads/1.png" />
+                    </div>
+                    <div class="col-md-7 ">
+                        {{ item.content }}
+                    </div>
+                </div>
+                <hr />
+            {% endfor %}
+        </div>
+        <div class="col-md-3 content-right">
+            adsfasdfasfasdfasf
+        </div>
+    </div>
+{% endblock %}
+
+{% block bottom_template %}
+{% endblock %}
