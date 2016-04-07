@@ -2,6 +2,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate,login,logout
+from forms import AritcleForms
 import models
 # Create your views here.
 def index(request):
@@ -14,7 +15,14 @@ def article_list(request, articlce_id):
         render(request,'404.html')
     return render(request,'article_list.html', {'contents':contents})
 def send_post(request):
-    pass
+    if request.method == "POST":
+        data = AritcleForms(request.POST,request.FILES)
+        if data.is_valid():
+            return  HttpResponse('post')
+        else:
+            return HttpResponse('error')
+    return render(request,'send_post.html')
+
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/')

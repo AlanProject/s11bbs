@@ -1,0 +1,29 @@
+{% extends 'index.html' %}
+{% block head_template %}
+    <script type="text/javascript" src="/static/plugins/ckeditor/ckeditor.js"></script>
+{% endblock %}
+
+{% block content_template %}
+    <form action="" method="post">
+        <input type="text"  name="article_title" class="form-control" placeholder="标题">
+        <select name="article_category_id" class="form-control">
+            {% for category in category_list %}
+                <option value="{{ category.id }}">
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="text" name="article_summery" class="form-control" placeholder="描述" >
+        <input type="file" name="article_headimg">必须选择图片
+        <textarea name="article_content"></textarea>
+        <div class="article_submit">
+            <button type="submit" class="btn btn-success btn-lg">发布</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block bottom_template %}
+    <script type="text/javascript">
+        CKEDITOR.replace('article_content');
+    </script>
+{% endblock %}

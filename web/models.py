@@ -11,6 +11,7 @@ class Article(models.Model):
     title = models.CharField(u"文章标题", max_length=255, unique=True)
     categroy = models.ForeignKey("Category", verbose_name=u"板块")
     head_img = models.ImageField(upload_to="uploads")
+    summery = models.CharField(max_length=25)
     content = models.TextField(u"内容")
     author = models.ForeignKey("UserProfile")
     publish_date = models.TimeField(auto_now=True)
