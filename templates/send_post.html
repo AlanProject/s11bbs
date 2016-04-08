@@ -4,12 +4,12 @@
 {% endblock %}
 
 {% block content_template %}
-    <form action="" method="post">
+    <form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
         <input type="text"  name="article_title" class="form-control" placeholder="标题">
         <select name="article_category_id" class="form-control">
-            {% for category in category_list %}
-                <option value="{{ category.id }}">
-                    {{ category.name }}
+            {% for k,v in category_tuple %}
+                <option value="{{ k }}">
+                    {{ v }}
                 </option>
             {% endfor %}
         </select>
@@ -17,7 +17,7 @@
         <input type="file" name="article_headimg">必须选择图片
         <textarea name="article_content"></textarea>
         <div class="article_submit">
-            <button type="submit" class="btn btn-success btn-lg">发布</button>
+            <button type="submit" style="float:right" class="btn btn-success btn-lg">发布</button>
         </div>
     </form>
 {% endblock %}

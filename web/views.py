@@ -16,12 +16,17 @@ def article_list(request, articlce_id):
     return render(request,'article_list.html', {'contents':contents})
 def send_post(request):
     if request.method == "POST":
-        data = AritcleForms(request.POST,request.FILES)
-        if data.is_valid():
+        forms = AritcleForms(request.POST,request.FILES)
+        if forms.is_valid():
+            #获取前端提交进来的值 字典格式{'name':'username'}
+            froms_dic = forms.cleaned_data
+
             return  HttpResponse('post')
         else:
-            return HttpResponse('error')
-    return render(request,'send_post.html')
+            print 'error'
+    # 获取版块信息格式：[{u'id': 2L, 'name': u'hot'}, {u'id': 1L, 'name': u'notice'}] 并传递到前端
+    category_tuple = models.Category.objects.all().values_list()
+    return render(request,'send_post.html',{'category_tuple':category_tuple})
 
 def user_logout(request):
     logout(request)
