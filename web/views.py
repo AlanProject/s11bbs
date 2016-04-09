@@ -6,14 +6,16 @@ from forms import AritcleForms,file_upload
 import models
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    contents = models.Article.objects.all()
+    return render(request, 'index.html',{'contents':contents})
 
-def article_list(request, articlce_id):
+def article_list(request, category_id):
     try:
-        contents = models.Article.objects.all()
+        contents = models.Article.objects.filter(category_id=category_id)
+        return render(request,'article_list.html', {'contents':contents})
     except ObjectDoesNotExist as e:
-        render(request,'404.html')
-    return render(request,'article_list.html', {'contents':contents})
+        return render(request,'404.html')
+
 def send_post(request):
     if request.method == "POST":
         forms = AritcleForms(request.POST,request.FILES)
@@ -59,6 +61,8 @@ def user_register(request):
 
 
 def article(request,article_id):
-    article_data = models.Article.objects.get(id=article_id)
-    print article_data
-    return render(request,'article.html',{'article_data':article_data})
+    try:
+        article_data = models.Article.objects.get(id=article_id)
+        return render(request,'article.html',{'article_data':article_data})
+    except ObjectDoesNotExist as e:
+        render(request,'404.html')
