@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate,login,logout
-from forms import AritcleForms
+from forms import AritcleForms,file_upload
 import models
 # Create your views here.
 def index(request):
@@ -18,12 +18,15 @@ def send_post(request):
     if request.method == "POST":
         forms = AritcleForms(request.POST,request.FILES)
         if forms.is_valid():
+            forms_dic = forms.cleaned_data
             #获取前端提交进来的值 字典格式{'name':'username'}
-            froms_dic = forms.cleaned_data
-
-            return  HttpResponse('post')
+            forms_dic['author_id'] = request.user.userprofile.user_id
+            forms_dic['head_img'] = file_upload(request,request.FILES['head_img'])
+            aritcle_obj = models.Article(**forms_dic)
+            aritcle_obj.save()
+            return  render(request,'send_post.html',{'aritcle_obj':aritcle_obj})
         else:
-            print 'error'
+            print forms.errors
     # 获取版块信息格式：[{u'id': 2L, 'name': u'hot'}, {u'id': 1L, 'name': u'notice'}] 并传递到前端
     category_tuple = models.Category.objects.all().values_list()
     return render(request,'send_post.html',{'category_tuple':category_tuple})
@@ -53,3 +56,9 @@ def user_login(request):
 
 def user_register(request):
     return render(request, 'register.html')
+
+
+def article(request,article_id):
+    article_data = models.Article.objects.get(id=article_id)
+    print article_data
+    return render(request,'article.html',{'article_data':article_data})

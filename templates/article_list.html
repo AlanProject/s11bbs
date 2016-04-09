@@ -10,10 +10,10 @@
             {% for item in contents %}
                 <div class="row">
                     <div class="col-md-4 head_img">
-                        <img src="/uploads/1.png" />
+                        <img src="{{ item.head_img }}" />
                     </div>
                     <div class="col-md-7 ">
-                        {{ item.content }}
+                        {{ item.summery|safe }}
                     </div>
                 </div>
                 <hr />

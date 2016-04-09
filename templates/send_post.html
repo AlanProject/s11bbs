@@ -4,26 +4,62 @@
 {% endblock %}
 
 {% block content_template %}
-    <form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
-        <input type="text"  name="article_title" class="form-control" placeholder="标题">
-        <select name="article_category_id" class="form-control">
-            {% for k,v in category_tuple %}
-                <option value="{{ k }}">
-                    {{ v }}
-                </option>
-            {% endfor %}
-        </select>
-        <input type="text" name="article_summery" class="form-control" placeholder="描述" >
-        <input type="file" name="article_headimg">必须选择图片
-        <textarea name="article_content"></textarea>
+    {% if aritcle_obj %}
+        <h3>文章 "{{ aritcle_obj.title }}" 已发布 <a href="{% url 'aritcle_view' aritcle_obj.id %}">点击查看</a></h3>
+    {% else %}
+        <form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
+        <table class="table table-bordered">
+            {#title#}
+            <tr>
+                <td>文章标题</td>
+                <td><input type="text"  name="title" class="form-control" placeholder="标题"></td>
+            </tr>
+            {#summery#}
+            <tr>
+                <td>文章描述</td>
+                <td><input type="text" name="summery" class="form-control" placeholder="描述" ></td>
+            </tr>
+            {#head_img#}
+            <tr>
+                <td>选择图片</td>
+                <td><input type="file" name="head_img"></td>
+            </tr>
+            {#category#}
+            <tr>
+                <td>选择版块</td>
+                <td><select name="category_id" class="form-control">
+                    {% for k,v in category_tuple %}
+                        <option value="{{ k }}">
+                            {{ v }}
+                        </option>
+                    {% endfor %}
+                    </select></td>
+            </tr>
+            {#hidden#}
+            <tr>
+                <td>是否可见</td>
+                <td><select name="hidden" class="form-control">
+            <option value="True">隐藏</option>
+            <option value="Flase" selected="selected">显示</option>
+        </select></td>
+            </tr>
+            {#priority#}
+            <tr>
+                <td>优先级</td>
+                <td><input type="text" class="form-control" name="priority" value="1000"></td>
+            </tr>
+        </table>
+        <textarea name="content"></textarea>
         <div class="article_submit">
             <button type="submit" style="float:right" class="btn btn-success btn-lg">发布</button>
         </div>
     </form>
+    {% endif %}
+
 {% endblock %}
 
 {% block bottom_template %}
     <script type="text/javascript">
-        CKEDITOR.replace('article_content');
+        CKEDITOR.replace('content');
     </script>
 {% endblock %}
