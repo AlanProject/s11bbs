@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^register/', views.user_register, name='register'),
     url(r'^send_post/', views.send_post, name='send_post'),
     url(r'^aritcle/(\d+)/$', views.article, name='aritcle_view'),
+    url(r'^comment/$', views.comment,)
 ]

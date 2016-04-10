@@ -10,7 +10,10 @@ class AritcleForms(forms.Form):
     content = forms.CharField(min_length=10)
     priority = forms.IntegerField()
     hidden = forms.CharField()
-
+class UserRegister(forms.Form):
+    username = forms.CharField(max_length=16)
+    password = forms.PasswordInput()
+    email = forms.EmailField()
 def file_upload(request,file):
     base_dir = 'statics/imgs'
     user_dir = '%s/%s'%(base_dir,request.user.userprofile.id)

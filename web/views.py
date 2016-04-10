@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate,login,logout
-from forms import AritcleForms,file_upload
+from forms import AritcleForms,file_upload,UserRegister
 import models
 # Create your views here.
 def index(request):
@@ -57,6 +57,11 @@ def user_login(request):
 
 
 def user_register(request):
+    if request == 'POST':
+        user_info = UserRegister(request.POST)
+        if user_info.is_valid():
+            user_data = user_info.cleaned_data
+
     return render(request, 'register.html')
 
 
@@ -66,3 +71,28 @@ def article(request,article_id):
         return render(request,'article.html',{'article_data':article_data})
     except ObjectDoesNotExist as e:
         render(request,'404.html')
+
+def deep_search(comment_dic,parent,son):
+    for k,v in comment_dic.items():
+        if k == parent:
+            comment_dic[k][son] = {}
+            return
+        else:
+            deep_search(v,parent,son)
+def comment(request,article_id=4):
+    comment_data = models.Comment.objects.filter(article_id=article_id).values()
+    comment_tuple = []
+    comment_dic = {}
+    for item in comment_data:
+        s = item.get('id')
+        p = item.get('parent_comment_id')
+        item = (p,s)
+        comment_tuple.append(item)
+    print comment_tuple
+    for parent,son in comment_tuple:
+        if parent is None:
+            comment_dic[son] = {}
+        else:
+            deep_search(comment_dic,parent,son)
+    print comment_dic
+    return HttpResponse(comment_dic)

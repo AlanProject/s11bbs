@@ -45,7 +45,6 @@
               </div><!--/.nav-collapse -->
             </div><!--/.container-fluid -->
         </nav>
-
         {% block content_template %}
             <div class="row">
                 <div class="col-md-7 content-left">
@@ -55,7 +54,7 @@
                                 <img src="{{ item.head_img }}" />
                             </div>
                             <div class="col-md-7 ">
-                                {{ item.summery|safe }}
+                                <a href="{% url 'aritcle_view' item.id  %}"> {{ item.summery|safe }}</a>
                             </div>
                         </div>
                         <hr />
