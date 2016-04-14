@@ -1,0 +1,135 @@
+{% extends 'index.html' %}
+{% block head_template %}
+    <link rel="stylesheet" href="/static/css/chat.css">
+{% endblock %}
+
+{% block content_template %}
+    <div class="chat_box">
+        <div class="row chat_content">
+            {#左侧联系人部分#}
+            <div class="col-md-3 chat_content_left">
+                {# 选择模块 切换群组/联系人 #}
+                <div class="contact_head">
+                    <div class="contact_menu action"  contact-type="single" content_id="{{ request.user.id }}"><a>联系人</a></div>
+                    <div class="contact_menu" contact-type="group" content_id="{{ request.user.id }}" ><a>群  组</a></div>
+                </div>
+                {# 列表显示联系人或者群组成员 #}
+                <div  class="chat_contact" id="contact_list">
+                    <ul class="list-group" >
+                    </ul>
+                </div>
+
+            </div>
+
+            {# 右侧聊天窗体部分 #}
+            <div class="col-md-7 chat_content_right ">
+                {##}
+                <div class="message_head" id="contact_box_head">
+                    <div class="message_title" ></div>
+                    <div class="message_describe"></div>
+                </div>
+                <div class="message_text" id="contact_box_message"></div>
+                <div class="message_input" id="contact_box_input">
+                    <textarea></textarea>
+                </div>
+                <div class="message_bottom" id="contact_box_bottom">
+                    <input class="btn btn-success" type="button" value="发送">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block bottom_template %}
+    <script type="text/javascript">
+    CONTACT = {};
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+        //获取数据列表
+        $(document).ready(function(){
+            var type = $('.contact_menu,.action').attr('contact-type');
+            var id = $('.contact_menu,.action').attr('content_id');
+            var data = {'id':id,'type':type};
+            var html = '';
+            $.ajax({
+                url: "{% url 'contact_select' %}", //请求到的url
+                data: data, //需要提交的数据内容 字典格式
+                type: "GET",  //使用GET模式进行请求
+                success: function (callback) {
+                    $.each(JSON.parse(callback)['contact_list'],function(k,v){
+                        CONTACT[v.id] = v.name;
+                        html +='<li style="margin-top:5px" onclick="ContactActive(this);" contact_id='+ v.id+' class="list-group-item">'+ v.name+'</li>'
+                    });
+                    $('#contact_list .list-group').append(html);
+                }
+            });
+        })//获取数据列表结束
+
+        //点击事件 选中联系人
+        function ContactActive(test){
+            {#封装消息内容#}
+            message_info = {
+                to:CONTACT[$('#contact_box_head .message_title').attr('contact_id')],
+                from:'{{ request.user.userprofile.name }}',
+                message:$('#contact_box_message').html()
+            };
+            {#将消息传递给上传消息函数进行保存处理#}
+            MessageUpToServer(message_info);
+            $('#contact_box_message').html('');
+            $(test).addClass('clinck');
+            $(test).siblings().removeClass('clinck');
+
+            {#获取用户之前的消息#}
+            $('#contact_box_head .message_title').html('<a>'+$(test).html()+'&nbsp'+'&nbsp'+'message ing ...'+'</a>')
+            $('#contact_box_head .message_title').attr('contact_id',$(test).attr('contact_id'))
+
+        }//点击事件 结束
+
+        //发送消息
+        $('#contact_box_bottom input').click(function(){
+            var input_data = $('#contact_box_input textarea').val();
+            var date_base = new Date();
+            var date = date_base.getFullYear()+'/'+date_base.getMonth()+1+'/'+date_base.getDate()+'&nbsp'+date_base.getHours()+':'+date_base.getMinutes()+':'+date_base.getSeconds();
+            var htmls = '<div class="message_my"><p>'+'{{ request.user.userprofile.name }}'+'&nbsp'+'&nbsp'+date+'</p>'+'<p>'+input_data+'</p></div>';
+            $('#contact_box_message').append(htmls);
+
+            $('#contact_box_input textarea').val('');
+        });//发送消息结束
+        //存储消息到后台
+        function MessageUpToServer(message){
+            $.ajax({
+                url:'{% url 'message_upload' %}',
+                data:message,
+                type:'POST',
+                success:function(callback){
+                    console.log(callback)
+                }
+            })
+        }
+    </script>
+{% endblock %}
