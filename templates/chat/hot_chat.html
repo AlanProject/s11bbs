@@ -92,6 +92,12 @@
 
         //点击事件 选中联系人
         function ContactActive(test){
+            message_info = {
+                to:$('#contact_box_head .message_title').attr('contact_id'),
+                from:'{{ request.user.userprofile.id }}',
+                message:$('#contact_box_message').html()
+            };
+            MessageUpToServer(message_info);
             $('#contact_box_message').html('');
             $(test).addClass('clinck');
             $(test).attr('satatus','active');
@@ -121,7 +127,7 @@
             $('#contact_box_input textarea').val('');
         });//发送消息结束
         //存储消息到后台
-        function MessageUpToServer(message,status){
+        function MessageUpToServer(message){
             $.ajax({
                 url:'{% url 'message_manage' %}',
                 data:message,

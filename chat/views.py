@@ -43,9 +43,5 @@ def message_manage(request):
         message_info['from'] = request.POST.get('from')
         if not message_queue.has_key(message_info['to']):
             message_queue[message_info['to']] = Queue.Queue()
-        message = []
-        message.append(message_queue[message_info['to']].get())
-        message.append(message_info)
-        message_queue[message_info['to']].put(message)
-        print message_queue.get(message_info['to']).qsize()
+        message_queue[message_info['to']].put(message_info)
         return HttpResponse('')
