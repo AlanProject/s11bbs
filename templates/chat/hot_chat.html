@@ -92,21 +92,14 @@
 
         //点击事件 选中联系人
         function ContactActive(test){
-            {#封装消息内容#}
-            message_info = {
-                to:CONTACT[$('#contact_box_head .message_title').attr('contact_id')],
-                from:'{{ request.user.userprofile.name }}',
-                message:$('#contact_box_message').html()
-            };
-            {#将消息传递给上传消息函数进行保存处理#}
-            MessageUpToServer(message_info);
             $('#contact_box_message').html('');
             $(test).addClass('clinck');
+            $(test).attr('satatus','active');
             $(test).siblings().removeClass('clinck');
-
-            {#获取用户之前的消息#}
             $('#contact_box_head .message_title').html('<a>'+$(test).html()+'&nbsp'+'&nbsp'+'message ing ...'+'</a>')
             $('#contact_box_head .message_title').attr('contact_id',$(test).attr('contact_id'))
+            {#获取用户之前的消息#}
+            MessageGetFromServer($('#contact_box_head .message_title').attr('contact_id'));
 
         }//点击事件 结束
 
@@ -116,20 +109,39 @@
             var date_base = new Date();
             var date = date_base.getFullYear()+'/'+date_base.getMonth()+1+'/'+date_base.getDate()+'&nbsp'+date_base.getHours()+':'+date_base.getMinutes()+':'+date_base.getSeconds();
             var htmls = '<div class="message_my"><p>'+'{{ request.user.userprofile.name }}'+'&nbsp'+'&nbsp'+date+'</p>'+'<p>'+input_data+'</p></div>';
+            {#封装消息内容#}
+            message_info = {
+                to:$('#contact_box_head .message_title').attr('contact_id'),
+                from:'{{ request.user.userprofile.id }}',
+                message:htmls
+            };
+            {#将消息传递给上传消息函数进行保存处理#}
+            MessageUpToServer(message_info);
             $('#contact_box_message').append(htmls);
-
             $('#contact_box_input textarea').val('');
         });//发送消息结束
         //存储消息到后台
-        function MessageUpToServer(message){
+        function MessageUpToServer(message,status){
             $.ajax({
-                url:'{% url 'message_upload' %}',
+                url:'{% url 'message_manage' %}',
                 data:message,
-                type:'POST',
-                success:function(callback){
-                    console.log(callback)
-                }
+                type:'POST'
             })
+        }
+        //获取消息
+        function MessageGetFromServer(contact){
+            $.ajax({
+                url:'{% url 'message_manage' %}',
+                type:'GET',
+                data:{'contact':contact},
+                success:function(callback){
+                    $.each(JSON.parse(callback), function (k,v) {
+                        $('#contact_box_message').append(v.message);
+                    });
+
+                }
+            });
+
         }
     </script>
 {% endblock %}

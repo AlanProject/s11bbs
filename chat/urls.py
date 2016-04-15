@@ -8,5 +8,5 @@ from chat import views
 urlpatterns = [
     url(r'^$', views.hot_chat, name='hot_chat'),
     url(r'^contact_select/$', views.contact_select, name='contact_select'),
-    url(r'^message_upload/$', views.message_upload, name='message_upload'),
+    url(r'^message_manage/$', views.message_manage, name='message_manage'),
 ]
