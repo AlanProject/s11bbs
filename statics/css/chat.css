@@ -73,6 +73,7 @@
 .chat_content .chat_content_right .message_text{
     height:300px;
     border:1px #F7F7F7 solid;
+    overflow:auto;
 }
 
 /*input*/

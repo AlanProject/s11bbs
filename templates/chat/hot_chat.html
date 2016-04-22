@@ -42,36 +42,41 @@
 
 {% block bottom_template %}
     <script type="text/javascript">
-    CONTACT = {};
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
+            return cookieValue;
         }
-        return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        var csrftoken = getCookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
             }
-        }
-    });
+        });
         //获取数据列表
         $(document).ready(function(){
+            CONTACT = {};
+            GLOBAL_LOCAL_SESSION = {
+                single:{},
+                group:{}
+            };
             var type = $('.contact_menu,.action').attr('contact-type');
             var id = $('.contact_menu,.action').attr('content_id');
             var data = {'id':id,'type':type};
@@ -83,71 +88,110 @@
                 success: function (callback) {
                     $.each(JSON.parse(callback)['contact_list'],function(k,v){
                         CONTACT[v.id] = v.name;
-                        html +='<li style="margin-top:5px" onclick="ContactActive(this);" contact_id='+ v.id+' class="list-group-item">'+ v.name+'</li>'
+                        html +='<li style="margin-top:5px" onclick="ContactActive(this);" contact_id='+ v.id+' class="list-group-item">'+ v.name+'<span class="badge">0</span>'+'</li>'
                     });
                     $('#contact_list .list-group').append(html);
                 }
             });
+
         })//获取数据列表结束
 
         //点击事件 选中联系人
         function ContactActive(test){
-            message_info = {
-                to:$('#contact_box_head .message_title').attr('contact_id'),
-                from:'{{ request.user.userprofile.id }}',
-                message:$('#contact_box_message').html()
-            };
-            MessageUpToServer(message_info);
+            MessageDumpSession($('#contact_box_message').html(), $('.action').attr('contact-type'), $('#contact_box_head .message_title').attr('contact_id'));
             $('#contact_box_message').html('');
             $(test).addClass('clinck');
             $(test).attr('satatus','active');
             $(test).siblings().removeClass('clinck');
-            $('#contact_box_head .message_title').html('<a>'+$(test).html()+'&nbsp'+'&nbsp'+'message ing ...'+'</a>')
-            $('#contact_box_head .message_title').attr('contact_id',$(test).attr('contact_id'))
+            $('#contact_box_head .message_title').html('<a>'+CONTACT[$(test).attr('contact_id')]+'&nbsp'+'&nbsp'+'message ing ...'+'</a>');
+            $('#contact_box_head .message_title').attr('contact_id',$(test).attr('contact_id'));
             {#获取用户之前的消息#}
-            MessageGetFromServer($('#contact_box_head .message_title').attr('contact_id'));
-
+            MessageLoadSession($('.action').attr('contact-type'), $(test).attr('contact_id'));
+            MessageGetFromServer();
         }//点击事件 结束
 
         //发送消息
         $('#contact_box_bottom input').click(function(){
             var input_data = $('#contact_box_input textarea').val();
             var date_base = new Date();
-            var date = date_base.getFullYear()+'/'+date_base.getMonth()+1+'/'+date_base.getDate()+'&nbsp'+date_base.getHours()+':'+date_base.getMinutes()+':'+date_base.getSeconds();
-            var htmls = '<div class="message_my"><p>'+'{{ request.user.userprofile.name }}'+'&nbsp'+'&nbsp'+date+'</p>'+'<p>'+input_data+'</p></div>';
-            {#封装消息内容#}
-            message_info = {
-                to:$('#contact_box_head .message_title').attr('contact_id'),
-                from:'{{ request.user.userprofile.id }}',
-                message:htmls
-            };
-            {#将消息传递给上传消息函数进行保存处理#}
-            MessageUpToServer(message_info);
-            $('#contact_box_message').append(htmls);
+
+            if (input_data){
+                {#封装消息内容#}
+                var message_info = {
+                    to:$('#contact_box_head .message_title').attr('contact_id'),
+                    from:'{{ request.user.userprofile.id }}',
+                    type:$('.action').attr('contact-type'),
+                    message:input_data
+                };
+                {#将消息传递给上传消息函数进行保存处理#}
+                MessageUpToServer(message_info);
+            }
             $('#contact_box_input textarea').val('');
         });//发送消息结束
+
         //存储消息到后台
-        function MessageUpToServer(message){
-            $.ajax({
-                url:'{% url 'message_manage' %}',
-                data:message,
-                type:'POST'
-            })
+        function MessageUpToServer(data){
+            if (data['message']){
+                $.ajax({
+                    url:'{% url 'message_manage' %}',
+                    data:data,
+                    type:'POST',
+                    success:function(callback){
+                        $('#contact_box_message').append(callback);
+                        $('.message_text').animate({scrollTop: $('.message_text')[0].scrollHeight}, 600);
+                    }
+                })
+            }
         }
+
         //获取消息
-        function MessageGetFromServer(contact){
+        function MessageGetFromServer(){
+
+            contact = {{ request.user.userprofile.id }}
             $.ajax({
                 url:'{% url 'message_manage' %}',
                 type:'GET',
-                data:{'contact':contact},
+                data:{'sendto':contact,
+                    'from':$('#contact_box_head .message_title').attr('contact_id'),
+                    'type':$('.action').attr('contact-type')
+                },
                 success:function(callback){
+                    var data = '';
                     $.each(JSON.parse(callback), function (k,v) {
+                        console.log(v.message);
                         $('#contact_box_message').append(v.message);
+                        $('.message_text').animate({scrollTop: $('.message_text')[0].scrollHeight}, 600);
                     });
-
+                    MessageGetFromServer();
                 }
             });
 
+        }
+
+        {#将对话框中的消息缓存到本地#}
+        function MessageDumpSession(message, type , sendto){
+            if (type == 'single'){
+                GLOBAL_LOCAL_SESSION['single'][sendto]  = message
+            }else{
+                GLOBAL_LOCAL_SESSION['group'][sendto] = message
+            }
+        }
+
+        {#将本地的消息缓存加载到对话框#}
+        function MessageLoadSession(type , sendto){
+            if (type == 'single'){
+                if (GLOBAL_LOCAL_SESSION.single[sendto]){
+                    $('#contact_box_message').html(GLOBAL_LOCAL_SESSION.single[sendto])
+                }else{
+                    $('#contact_box_message').html('')
+                }
+            }else{
+                if (GLOBAL_LOCAL_SESSION.group[sendto]){
+                    $('#contact_box_message').html(GLOBAL_LOCAL_SESSION.single[sendto])
+                }else{
+                    $('#contact_box_message').html('')
+                }
+            }
         }
     </script>
 {% endblock %}
