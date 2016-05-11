@@ -23,18 +23,15 @@
                     <li><a class="navbar-brand" href="{% url 'index' %}">首页</a></li>
                     <li class="active"><a href="{% url 'article_list' 1 %}">精华帖</a></li>
                     <li><a href="{% url 'article_list' 2 %}">热帖</a></li>
+                    <li><a href="{% url 'hot_chat' %}">热聊</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if request.user.is_authenticated %}
                         <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.user.userprofile.name }} <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" uid="{{ request.user.userprofile.id }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.user.userprofile.name }} <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'send_post' %}">发帖</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li class="dropdown-header">Nav header</li>
-                                <li><a href="#">Separated link</a></li>
                                 <li><a href="{% url 'logout' %}">注销</a></li>
                             </ul>
                         </li>
@@ -45,7 +42,6 @@
               </div><!--/.nav-collapse -->
             </div><!--/.container-fluid -->
         </nav>
-
         {% block content_template %}
             <div class="row">
                 <div class="col-md-7 content-left">
@@ -55,7 +51,7 @@
                                 <img src="{{ item.head_img }}" />
                             </div>
                             <div class="col-md-7 ">
-                                {{ item.summery|safe }}
+                                <a href="{% url 'aritcle_view' item.id  %}"> {{ item.summery|safe }}</a>
                             </div>
                         </div>
                         <hr />

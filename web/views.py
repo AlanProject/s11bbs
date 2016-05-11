@@ -2,9 +2,10 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate,login,logout
-from forms import AritcleForms,file_upload
+from forms import AritcleForms,file_upload,UserRegister
 import models
 # Create your views here.
+
 def index(request):
     contents = models.Article.objects.all()
     return render(request, 'index.html',{'contents':contents})
@@ -57,12 +58,19 @@ def user_login(request):
 
 
 def user_register(request):
+    if request == 'POST':
+        user_info = UserRegister(request.POST)
+        if user_info.is_valid():
+            user_data = user_info.cleaned_data
+
     return render(request, 'register.html')
 
 
 def article(request,article_id):
+
     try:
         article_data = models.Article.objects.get(id=article_id)
         return render(request,'article.html',{'article_data':article_data})
     except ObjectDoesNotExist as e:
         render(request,'404.html')
+

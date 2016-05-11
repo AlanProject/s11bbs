@@ -1,14 +1,17 @@
 {% extends 'index.html' %}
-
+{% load comment %}
 {% block head_template %}
+    <link rel="stylesheet" href="/static/css/article.css">
 {% endblock %}
-
 {% block content_template %}
     {% csrf_token %}
     {{ article_data.title }}
     <hr />
     {{ article_data.content|safe }}
-{% endblock %}
-
-{% block bottom_template %}
+    <div>
+        {% autoescape off %}
+            <hr/>
+            {% comment_tree article_data.comment_set.select_related  %}
+        {% endautoescape %}
+    </div>
 {% endblock %}
