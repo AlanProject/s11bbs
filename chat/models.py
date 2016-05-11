@@ -7,3 +7,6 @@ class ChatGroup(models.Model):
     descride = models.CharField(max_length=100,null=True,blank=True)
     def __unicode__(self):
         return "group%s descride:%s" % (self.name ,self.descride)
+    class Meta:
+        verbose_name = '用户组'
+        verbose_name_plural = '用户组'

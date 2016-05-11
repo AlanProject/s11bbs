@@ -21,15 +21,15 @@
 }
 .chat_content .chat_content_left .contact_head .contact_menu{
     padding-left:25px;
+    padding-right: 25px;
     display:inline-block;
     font-weight:bold;
 }
-.chat_content .chat_content_left .contact_head a:hover{
+.chat_content .chat_content_left .contact_head .action{
     background:#f5f5f5;
-    padding:15px;
+
     color:green;
 }
-
 .chat_content .chat_content_left .chat_contact li:hover{
     background:#f5f5f5;
 
